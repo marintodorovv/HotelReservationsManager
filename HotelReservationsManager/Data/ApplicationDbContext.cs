@@ -14,5 +14,12 @@ namespace HotelReservationsManager.Data
             : base(options)
         {
         }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("Server=DESKTOP-64FVMNQ\\SQLEXPRESS;Database=HotelReservationsManager;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True");
+            }
+        }
     }
 }
