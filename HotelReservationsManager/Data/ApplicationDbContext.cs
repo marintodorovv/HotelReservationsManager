@@ -4,7 +4,7 @@ using HotelReservationsManager.Models.Entities;
 
 namespace HotelReservationsManager.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<User>
     {
         DbSet<Client> Clients { get; set; }
         DbSet<User> Users { get; set; }
