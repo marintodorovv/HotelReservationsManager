@@ -1,11 +1,13 @@
-﻿namespace HotelReservationsManager.Models.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace HotelReservationsManager.Models.Entities
 {
     public class Reservation
     {
         public Guid ID { get; set; }
-        public Room Room { get; set; }
-        public User Creator { get; set; }
-        public List<Client> Clients { get; set; }
+		public virtual Room Room { get; set; }
+		public virtual User User { get; set; }
+        public virtual List<Client> Clients { get; set; }
         public DateTime AccommodationDate { get; set; }
         public DateTime LeaveDate { get; set; }
         public bool Breakfast { get; set; }

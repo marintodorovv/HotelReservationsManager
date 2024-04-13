@@ -1,0 +1,34 @@
+﻿@{
+}
+@model List<Room>
+
+<h1>Rooms</h1>
+
+<td><a class="btn btn-primary" asp-controller="Room" asp-action="Add">Add a new Room.</a></td>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>Room Number</th>
+			<th>Available</th>
+			<th>Capacity</th>
+			<th>Type</th>
+			<th>Price Per Adult Bed</th>
+			<th>Price Per Child Bed</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>@item.RoomNumber</td>
+				<td>@item.Available</td>
+				<td>@item.Capacity</td>
+				<td>@item.Type</td>
+				<td>@item.PricePerAdultBed</td>
+				<td>@item.PricePerChildBed</td>
+				<td><a class="btn btn-primary" asp-controller="Room" asp-action="Edit" asp-route-id="@item.ID">Edit</a></td>
+			</tr>
+		}
+	</tbody>
+</table>

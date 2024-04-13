@@ -6,14 +6,14 @@ namespace HotelReservationsManager.Data
 {
     public class ApplicationDbContext : IdentityDbContext<User>
     {
-        DbSet<Client> Clients { get; set; }
-        DbSet<User> Users { get; set; }
-        DbSet<Room> Rooms { get; set; }
-        DbSet<Reservation> Reservations { get; set; }
+        public DbSet<Client> Clients { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Room> Rooms { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-        }
+		}
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

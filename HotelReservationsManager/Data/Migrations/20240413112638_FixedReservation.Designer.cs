@@ -4,6 +4,7 @@ using HotelReservationsManager.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelReservationsManager.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240413112638_FixedReservation")]
+    partial class FixedReservation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,6 +74,9 @@ namespace HotelReservationsManager.Data.Migrations
                     b.Property<bool>("Breakfast")
                         .HasColumnType("bit");
 
+                    b.Property<string>("CreatorId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("LeaveDate")
                         .HasColumnType("datetime2");
 
@@ -81,14 +86,11 @@ namespace HotelReservationsManager.Data.Migrations
                     b.Property<decimal>("Sum")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("ID");
 
-                    b.HasIndex("RoomID");
+                    b.HasIndex("CreatorId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("RoomID");
 
                     b.ToTable("Reservations");
                 });
@@ -98,6 +100,9 @@ namespace HotelReservationsManager.Data.Migrations
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Available")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
@@ -357,19 +362,19 @@ namespace HotelReservationsManager.Data.Migrations
 
             modelBuilder.Entity("HotelReservationsManager.Models.Entities.Reservation", b =>
                 {
+                    b.HasOne("HotelReservationsManager.Models.Entities.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId");
+
                     b.HasOne("HotelReservationsManager.Models.Entities.Room", "Room")
                         .WithMany()
                         .HasForeignKey("RoomID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HotelReservationsManager.Models.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                    b.Navigation("Creator");
 
                     b.Navigation("Room");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
