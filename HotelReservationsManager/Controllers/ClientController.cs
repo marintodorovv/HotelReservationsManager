@@ -13,11 +13,13 @@ namespace HotelReservationsManager.Controllers
 	public class ClientController : Controller
     {
         private readonly ApplicationDbContext DbContext;
-        public ClientController(ApplicationDbContext dbContext)
-        {
-            DbContext = dbContext;
-        }
-        public IActionResult Index()
+		private readonly UserManager<User> UserManager;
+		public ClientController(ApplicationDbContext dbContext, UserManager<User> userManager)
+		{
+			DbContext = dbContext;
+			UserManager = userManager;
+		}
+		public IActionResult Index()
         {
             return View();
         }
@@ -29,6 +31,15 @@ namespace HotelReservationsManager.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(Client Model)
         {
+            User Current = await UserManager.GetUserAsync(User);
+			if (!Current.Active)
+            {
+                return RedirectToAction("List", "Client");
+			}
+			if (Model.Email == "" || Model.FirstName == "" || Model.LastName == "" || Model.PhoneNumber == "" ||Model.PhoneNumber.Length != 10)
+            {
+				return RedirectToAction("List", "Client");
+			}
             Client Client = new Client();
             Client.PhoneNumber = Model.PhoneNumber;
             Client.FirstName = Model.FirstName;
@@ -42,18 +53,37 @@ namespace HotelReservationsManager.Controllers
         [HttpGet]
         public async Task<IActionResult> List(List<Client> Clients)
         {
-            return View(await DbContext.Clients.ToListAsync());
+			User Current = await UserManager.GetUserAsync(User);
+			if (!Current.Active)
+			{
+				return RedirectToAction("List", "Client");
+			}
+			return View(await DbContext.Clients.ToListAsync());
         }
         [HttpGet]
         public async Task<IActionResult> Edit(Guid ID)
         {
-            Client Client = await DbContext.Clients.FindAsync(ID);
+			User Current = await UserManager.GetUserAsync(User);
+			if (!Current.Active)
+			{
+				return RedirectToAction("List", "Client");
+			}
+			Client Client = await DbContext.Clients.FindAsync(ID);
             return View(Client);
         }
         [HttpPost]
         public async Task<IActionResult> Edit(Client Model)
         {
-            Client Client = await DbContext.Clients.FindAsync(Model.ID);
+			User Current = await UserManager.GetUserAsync(User);
+			if (!Current.Active)
+			{
+				return RedirectToAction("List", "Client");
+			}
+			if (Model.Email == "" || Model.FirstName == "" || Model.LastName == "" || Model.PhoneNumber == "" || Model.PhoneNumber.Length != 10)
+			{
+				return RedirectToAction("List", "Client");
+			}
+			Client Client = await DbContext.Clients.FindAsync(Model.ID);
             if (Client is not null)
             {
                 Client.PhoneNumber = Model.PhoneNumber;
@@ -68,7 +98,12 @@ namespace HotelReservationsManager.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(Guid ID)
         {
-            Client Client = await DbContext.Clients.FindAsync(ID);
+			User Current = await UserManager.GetUserAsync(User);
+			if (!Current.Active)
+			{
+				return RedirectToAction("List", "Client");
+			}
+			Client Client = await DbContext.Clients.FindAsync(ID);
             if (Client is not null)
             {
                 DbContext.Clients.Remove(Client);
@@ -76,5 +111,17 @@ namespace HotelReservationsManager.Controllers
             }
             return RedirectToAction("List", "Client");
         }
+        [HttpGet]
+        public async Task<IActionResult> Reservations(Guid ID)
+        {
+			User Current = await UserManager.GetUserAsync(User);
+			if (!Current.Active)
+			{
+				return RedirectToAction("List", "Client");
+			}
+			List<Reservation> Reservations = await DbContext.Reservations.Include(x => x.Room).Include(x => x.User).Include(x => x.Clients).ToListAsync();
+            Reservations = Reservations.Where(x => x.Clients.Contains(DbContext.Clients.Find(ID))).ToList();
+            return View(Reservations);
+		}
     }
 }

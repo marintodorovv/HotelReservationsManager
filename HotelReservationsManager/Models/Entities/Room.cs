@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using static System.Formats.Asn1.AsnWriter;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace HotelReservationsManager.Models.Entities
 {
@@ -17,9 +18,11 @@ namespace HotelReservationsManager.Models.Entities
     public class Room
     {
 		public Guid ID { get; set; }
-        public int Capacity { get; set; }
+		[Required]
+		public int Capacity { get; set; }
         public Type Type { get; set; }
-        public bool Available
+		[Required]
+		public bool Available
         {
             get
             {
@@ -36,9 +39,12 @@ namespace HotelReservationsManager.Models.Entities
 				return true;
 			}
 			}
-        public decimal PricePerAdultBed { get; set; }
-        public decimal PricePerChildBed { get; set; }
-        public string RoomNumber { get; set; }
+		[Required]
+		public decimal PricePerAdultBed { get; set; }
+		[Required]
+		public decimal PricePerChildBed { get; set; }
+		[Required]
+		public string RoomNumber { get; set; }
     }
 
 }

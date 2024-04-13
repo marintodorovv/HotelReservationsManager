@@ -30,7 +30,11 @@ namespace HotelReservationsManager.Controllers
         public async Task<IActionResult> Add(ReservationViewModel Model)
         {
             Reservation Reservation = new Reservation();
-            Reservation.User = await UserManager.GetUserAsync(User);
+			if (Model.AccommodationDate > Model.LeaveDate)
+			{
+				return RedirectToAction("List", "Reservation");
+			}
+			Reservation.User = await UserManager.GetUserAsync(User);
             Reservation.Room = DbContext.Rooms.ToList().Find(x => x.RoomNumber == Model.Room);
             Reservation.Clients = new List<Client> { DbContext.Clients.ToList().Find(x => x.Email == Model.Client) };
             Reservation.AccommodationDate = Model.AccommodationDate;
@@ -90,6 +94,10 @@ namespace HotelReservationsManager.Controllers
             Reservation Reservation = await DbContext.Reservations.Include(x => x.Room).Include(x => x.User).Include(x => x.Clients).FirstOrDefaultAsync(x => x.ID == Model.Id);
             if (Reservation is not null)
             {
+                if (Model.AccommodationDate > Model.LeaveDate)
+                {
+					return RedirectToAction("List", "Reservation");
+				}
                 Reservation.Room = DbContext.Rooms.ToList().Find(x => x.RoomNumber == Model.Room);
                 Reservation.AccommodationDate = Model.AccommodationDate;
                 Reservation.LeaveDate = Model.LeaveDate;
@@ -134,5 +142,25 @@ namespace HotelReservationsManager.Controllers
             }
             return RedirectToAction("List", "Reservation");
         }
-    }
+        [HttpGet]
+        public async Task<IActionResult> Clients(Guid ID)
+        {
+			Reservation Reservation = await DbContext.Reservations.Include(x => x.Room).Include(x => x.User).Include(x => x.Clients).FirstOrDefaultAsync(x => x.ID == ID);
+			List<Client> Clients = DbContext.Reservations.Include(x => x.Room).Include(x => x.User).Include(x => x.Clients).Where(x => x.ID == ID).ToList().FirstOrDefault().Clients;
+            return View(new ClientReservationModel { Clients = Clients, Id = ID });
+		}
+        [HttpGet]
+		public async Task<IActionResult> AddClient(Guid ID)
+		{
+            return View(new ClientViewModel { Guid = ID, Email = ""});
+		}
+		[HttpPost]
+		public async Task<IActionResult> AddClient(ClientViewModel ViewModel)
+		{
+			Reservation Reservation = await DbContext.Reservations.Include(x => x.Room).Include(x => x.User).Include(x => x.Clients).FirstOrDefaultAsync(x => x.ID == ViewModel.Guid);
+            Reservation.Clients.Add(DbContext.Clients.ToList().FirstOrDefault(x => x.Email == ViewModel.Email));
+            await DbContext.SaveChangesAsync();
+			return RedirectToAction("List", "Reservation");
+        }
+	}
 }

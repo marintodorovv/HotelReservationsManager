@@ -26,13 +26,22 @@ namespace HotelReservationsManager.Controllers
             return View();
         }
         [HttpGet]
-        public IActionResult Add()
+        public async Task<IActionResult> Add()
         {
-            return View();
+			User Current = await UserManager.GetUserAsync(User);
+			if (!Current.Active)
+			{
+				return RedirectToAction("List", "User");
+			}
+			return View();
         }
         [HttpPost]
 		public async Task<IActionResult> Add(UserViewModel Model)
 		{
+            if (Model.Email == "" || Model.MiddleName == "" || Model.LastName == "" || Model.PhoneNumber == "" || Model.EGN == "" || Model.EGN.Length != 10 || Model.PhoneNumber.Length != 10 )
+            {
+				return RedirectToAction("List", "User");
+			}
             User User = Activator.CreateInstance<User>();
             User.Active = true;
             User.HireDate = DateTime.Now;
@@ -56,33 +65,52 @@ namespace HotelReservationsManager.Controllers
 		[HttpGet]
 		public async Task<IActionResult> List()
 		{
+			User Current = await UserManager.GetUserAsync(User);
+			if (!Current.Active)
+			{
+				return RedirectToAction("List", "User");
+			}
 			return View(await DbContext.Users.ToListAsync());
 		}
         [HttpGet]
         public async Task<IActionResult> Edit(Guid ID)
         {
-            User User = await DbContext.Users.FindAsync(ID.ToString());
-            return View(User);
+			User Current = await UserManager.GetUserAsync(User);
+			if (!Current.Active)
+			{
+				return RedirectToAction("List", "User");
+			}
+			User Usera = await DbContext.Users.FindAsync(ID.ToString());
+            return View(Usera);
         }
         [HttpPost]
         public async Task<IActionResult> Edit(User Model)
         {
-            User User = await DbContext.Users.FindAsync(Model.Id.ToString());
-            if (User is not null)
+			User Current = await UserManager.GetUserAsync(User);
+			if (!Current.Active)
+			{
+				return RedirectToAction("List", "User");
+			}
+			if (Model.Email == "" || Model.MiddleName == "" || Model.LastName == "" || Model.PhoneNumber == "" || Model.EGN == "" || Model.EGN.Length != 10 || Model.PhoneNumber.Length != 10)
+			{
+				return RedirectToAction("List", "User");
+			}
+			User Usera = await DbContext.Users.FindAsync(Model.Id.ToString());
+            if (Usera is not null)
             {
-                User.FireDate = Model.FireDate;
-                User.FirstName = Model.FirstName;
-                User.LastName = Model.LastName;
-                User.MiddleName = Model.MiddleName;
-                User.EGN = Model.EGN;
-                User.Email = Model.Email;
-                User.NormalizedEmail = Model.Email.ToUpper();
-                User.UserName = Model.Email;
-                User.NormalizedUserName = Model.Email.ToUpper();
-                User.PhoneNumber = Model.PhoneNumber;
-                User.Active = Model.Active;
-                User.HireDate = Model.HireDate;
-                User.FireDate = Model.FireDate;
+                Usera.FireDate = Model.FireDate;
+                Usera.FirstName = Model.FirstName;
+                Usera.LastName = Model.LastName;
+                Usera.MiddleName = Model.MiddleName;
+                Usera.EGN = Model.EGN;
+                Usera.Email = Model.Email;
+                Usera.NormalizedEmail = Model.Email.ToUpper();
+                Usera.UserName = Model.Email;
+                Usera.NormalizedUserName = Model.Email.ToUpper();
+                Usera.PhoneNumber = Model.PhoneNumber;
+                Usera.Active = Model.Active;
+                Usera.HireDate = Model.HireDate;
+                Usera.FireDate = Model.FireDate;
                 await DbContext.SaveChangesAsync();
             }
             return RedirectToAction("List", "User");
@@ -90,10 +118,15 @@ namespace HotelReservationsManager.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(Guid ID)
         {
-            User User = await DbContext.Users.FindAsync(ID.ToString());
-            if (User is not null)
+			User Current = await UserManager.GetUserAsync(User);
+			if (!Current.Active)
+			{
+				return RedirectToAction("List", "User");
+			}
+			User Usera = await DbContext.Users.FindAsync(ID.ToString());
+            if (Usera is not null)
             {
-                DbContext.Users.Remove(User);
+                DbContext.Users.Remove(Usera);
                 await DbContext.SaveChangesAsync();
             }
             return RedirectToAction("List", "User");

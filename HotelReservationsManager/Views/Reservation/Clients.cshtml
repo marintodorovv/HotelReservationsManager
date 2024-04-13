@@ -1,0 +1,30 @@
+﻿@{
+}
+@model ClientReservationModel
+<h1>Clients</h1>
+
+<td><a class="btn btn-primary" asp-controller="Reservation" asp-action="AddClient" asp-route-id="@Model.Id">Add a client to reservation.</a></td>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>First Name</th>
+			<th>Last Name</th>
+			<th>Email</th>
+			<th>Phone Number</th>
+			<th>Adult</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model.Clients)
+		{
+					<tr>
+						<td>@item.FirstName</td>
+						<td>@item.LastName</td>
+						<td>@item.Email</td>
+						<td>@item.PhoneNumber</td>
+						<td>@item.Adult</td>
+					</tr>
+		}
+	</tbody>
+</table>

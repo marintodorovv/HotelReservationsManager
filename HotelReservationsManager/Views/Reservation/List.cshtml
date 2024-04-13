@@ -29,7 +29,7 @@
 						<td>@item.Breakfast</td>
 						<td>@item.AllInclusive</td>
 						<td>@item.Sum</td>
-						<td><a class="btn btn-primary" asp-controller="Client" asp-action="ListClients" asp-route-id="@item.Clients.ToList()">View Clients</a></td>
+						<td><a class="btn btn-primary" asp-controller="Reservation" asp-action="Clients" asp-route-id="@item.ID">View Clients</a></td>
 						<td><a class="btn btn-primary" asp-controller="Reservation" asp-action="Edit" asp-route-id="@item.ID">Edit</a></td>
 					</tr>
 		}

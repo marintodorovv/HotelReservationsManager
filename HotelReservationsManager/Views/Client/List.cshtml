@@ -26,6 +26,7 @@
 					<td>@item.PhoneNumber</td>
 					<td>@item.Adult</td>
 					<td><a class="btn btn-primary" asp-controller="Client" asp-action="Edit" asp-route-id="@item.ID">Edit</a></td>
+					<td><a class="btn btn-primary" asp-controller="Client" asp-action="Reservations" asp-route-id="@item.ID">All reservations</a></td>
 				</tr>
 		}
 	</tbody>

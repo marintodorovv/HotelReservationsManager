@@ -1,6 +1,7 @@
 ﻿using HotelReservationsManager.Data;
 using HotelReservationsManager.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -11,9 +12,11 @@ namespace HotelReservationsManager.Controllers
 	public class RoomController : Controller
     {
         private readonly ApplicationDbContext DbContext;
-        public RoomController(ApplicationDbContext dbContext)
+		private readonly UserManager<User> UserManager;
+		public RoomController(ApplicationDbContext dbContext, UserManager<User> userManger)
         {
             DbContext = dbContext;
+            UserManager = userManger;
         }
         public IActionResult Index()
         {
@@ -29,6 +32,10 @@ namespace HotelReservationsManager.Controllers
         public async Task<IActionResult> Add(Room Model)
         {
             Room Room = new Room();
+            if (Model.RoomNumber == "" || Model.Capacity < 0 || Model.PricePerAdultBed <= 0 || Model.PricePerChildBed <= 0)
+            {
+				return RedirectToAction("List", "Room");
+			}
             Room.RoomNumber = Model.RoomNumber;
             Room.Type = Model.Type;
             Room.Capacity = Model.Capacity;
@@ -41,7 +48,12 @@ namespace HotelReservationsManager.Controllers
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            return View(await DbContext.Rooms.ToListAsync());
+			User Current = await UserManager.GetUserAsync(User);
+			if (!Current.Active)
+			{
+				return RedirectToAction("List", "Room");
+			}
+			return View(await DbContext.Rooms.ToListAsync());
         }
 		[Authorize(Roles = "Admin")]
 		[HttpGet]
@@ -54,7 +66,11 @@ namespace HotelReservationsManager.Controllers
 		[HttpPost]
         public async Task<IActionResult> Edit(Room Model)
         {
-            Room Room = await DbContext.Rooms.FindAsync(Model.ID);
+			if (Model.RoomNumber == "" || Model.Capacity < 0 || Model.PricePerAdultBed <= 0 || Model.PricePerChildBed <= 0)
+			{
+				return RedirectToAction("List", "Room");
+			}
+			Room Room = await DbContext.Rooms.FindAsync(Model.ID);
             if (Room is not null)
             {
                 Room.RoomNumber = Model.RoomNumber;
