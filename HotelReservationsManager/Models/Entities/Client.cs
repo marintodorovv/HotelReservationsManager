@@ -15,6 +15,7 @@ namespace HotelReservationsManager.Models.Entities
 		public string Email { get; set; }
 		[Required]
 		public bool Adult { get; set; }
+		public virtual List<Reservation> Reservations { get; set; }
 
     }
 }
